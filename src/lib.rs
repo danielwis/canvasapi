@@ -8,3 +8,4 @@ pub mod error;
 pub mod grading_period;
 pub mod permission;
 pub mod timestamps;
+pub mod user;
