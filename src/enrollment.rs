@@ -142,14 +142,13 @@ pub struct Enrollment {
     // The total activity time of the user for the enrollment, in seconds.
     pub total_activity_time: Option<u32>,
     // The URL to the Canvas web UI page for this course enrollment.
-    pub html_url: Option<String>, // TODO Url type?
+    pub html_url: Option<String>,
     // The URL to the Canvas web UI page containing the grades associated with this
     // enrollment.
     pub grades: Option<Grade>,
     // A description of the user.
     // TODO
     // user: {"id":u32,"name":"Student 1","sortable_name":"1, Student","short_name":"Stud 1"},
-
 
     // The user's override grade for the course.
     pub override_grade: Option<String>,

@@ -1,6 +1,6 @@
-use reqwest::header::{HeaderMap, HeaderValue, AUTHORIZATION};
-
 use crate::error::CanvasError;
+
+use reqwest::header::{HeaderMap, HeaderValue, AUTHORIZATION};
 
 pub struct Canvas {
     client: reqwest::Client,
@@ -8,6 +8,7 @@ pub struct Canvas {
 }
 
 impl Canvas {
+    // TODO: Include API version as an argument
     pub fn init(api_url: &str, api_token: &str) -> Result<Self, CanvasError> {
         // TODO: Warn/error if URL...
         // - contains an API version

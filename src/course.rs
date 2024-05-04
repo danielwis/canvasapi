@@ -147,14 +147,14 @@ pub struct Course {
     #[serde(deserialize_with = "deserialize_optional_timestamp")]
     pub end_at: Option<OffsetDateTime>,
     // the course-set locale, if applicable
-    pub locale: Option<String>, // TODO: Use proper locale?
+    pub locale: Option<String>,
     // A list of enrollments linking the current user to the course. for student
     // enrollments, grading information may be included if include[]=total_scores
     pub enrollments: Option<Vec<Enrollment>>,
     // optional: the total number of active and invited students in the course
     pub total_students: Option<u32>,
     // course calendar
-    pub calendar: Option<CalendarLink>, // TODO: What is this object? Just the link?
+    pub calendar: Option<CalendarLink>,
     // the type of page that users will see when they first visit the course -
     // 'feed': Recent Activity Dashboard - 'wiki': Wiki Front Page - 'modules':
     // Course Modules/Sections Page - 'assignments': Course Assignments List -
@@ -197,7 +197,7 @@ pub struct Course {
     // the course because of date restriction settings
     pub access_restricted_by_date: Option<bool>,
     // The course's IANA time zone name.
-    pub time_zone: String, // TODO proper time zone?
+    pub time_zone: String,
     // optional: whether the course is set as a Blueprint Course (blueprint fields
     // require the Blueprint Courses feature)
     pub blueprint: bool,
