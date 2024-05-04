@@ -1,14 +1,14 @@
+use crate::canvas::Canvas;
+use crate::enrollment::Enrollment;
+use crate::timestamps::deserialize_optional_timestamp;
 use crate::{
     blueprint_course::BlueprintRestrictions, error::CanvasError, grading_period::GradingPeriod,
     permission::Permission,
 };
+
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fmt::Display;
-
-use crate::canvas::Canvas;
-use crate::enrollment::Enrollment;
-use crate::timestamps::deserialize_optional_timestamp;
-use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 
 impl Canvas {

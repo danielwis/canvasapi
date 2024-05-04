@@ -1,4 +1,5 @@
 use crate::timestamps::deserialize_optional_timestamp;
+
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 
@@ -24,46 +25,46 @@ pub enum EnrollmentState {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Grade {
-  // The URL to the Canvas web UI page for the user's grades, if this is a student
-  // enrollment.
-  pub html_url: String,
-  // The user's current grade in the class. Only included if user has permissions
-  // to view this grade.
-  pub current_grade: String,
-  // The user's final grade for the class. Only included if user has permissions
-  // to view this grade.
-  pub final_grade: String,
-  // The user's current score in the class. Only included if user has permissions
-  // to view this score.
-  pub current_score: u32,
-  // The user's final score for the class. Only included if user has permissions
-  // to view this score.
-  pub final_score: u32,
-  // The total points the user has earned in the class. Only included if user has
-  // permissions to view this score and 'current_points' is passed in the
-  // request's 'include' parameter.
-  pub current_points: u32,
-  // The user's current grade in the class including muted/unposted assignments.
-  // Only included if user has permissions to view this grade, typically teachers,
-  // TAs, and admins.
-  pub unposted_current_grade: String,
-  // The user's final grade for the class including muted/unposted assignments.
-  // Only included if user has permissions to view this grade, typically teachers,
-  // TAs, and admins..
-  pub unposted_final_grade: String,
-  // The user's current score in the class including muted/unposted assignments.
-  // Only included if user has permissions to view this score, typically teachers,
-  // TAs, and admins..
-  pub unposted_current_score: u32,
-  // The user's final score for the class including muted/unposted assignments.
-  // Only included if user has permissions to view this score, typically teachers,
-  // TAs, and admins..
-  pub unposted_final_score: u32,
-  // The total points the user has earned in the class, including muted/unposted
-  // assignments. Only included if user has permissions to view this score
-  // (typically teachers, TAs, and admins) and 'current_points' is passed in the
-  // request's 'include' parameter.
-  pub unposted_current_points: u32
+    // The URL to the Canvas web UI page for the user's grades, if this is a student
+    // enrollment.
+    pub html_url: String,
+    // The user's current grade in the class. Only included if user has permissions
+    // to view this grade.
+    pub current_grade: String,
+    // The user's final grade for the class. Only included if user has permissions
+    // to view this grade.
+    pub final_grade: String,
+    // The user's current score in the class. Only included if user has permissions
+    // to view this score.
+    pub current_score: u32,
+    // The user's final score for the class. Only included if user has permissions
+    // to view this score.
+    pub final_score: u32,
+    // The total points the user has earned in the class. Only included if user has
+    // permissions to view this score and 'current_points' is passed in the
+    // request's 'include' parameter.
+    pub current_points: u32,
+    // The user's current grade in the class including muted/unposted assignments.
+    // Only included if user has permissions to view this grade, typically teachers,
+    // TAs, and admins.
+    pub unposted_current_grade: String,
+    // The user's final grade for the class including muted/unposted assignments.
+    // Only included if user has permissions to view this grade, typically teachers,
+    // TAs, and admins..
+    pub unposted_final_grade: String,
+    // The user's current score in the class including muted/unposted assignments.
+    // Only included if user has permissions to view this score, typically teachers,
+    // TAs, and admins..
+    pub unposted_current_score: u32,
+    // The user's final score for the class including muted/unposted assignments.
+    // Only included if user has permissions to view this score, typically teachers,
+    // TAs, and admins..
+    pub unposted_final_score: u32,
+    // The total points the user has earned in the class, including muted/unposted
+    // assignments. Only included if user has permissions to view this score
+    // (typically teachers, TAs, and admins) and 'current_points' is passed in the
+    // request's 'include' parameter.
+    pub unposted_current_points: u32,
 }
 
 // TODO: Does a Enum make sense for grade fields?
