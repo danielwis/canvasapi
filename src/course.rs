@@ -12,7 +12,7 @@ use std::fmt::Display;
 use time::OffsetDateTime;
 
 impl Canvas {
-    pub async fn course_get(&self, course_id: u32) -> Result<Course, CanvasError> {
+    pub async fn get_course(&self, course_id: u32) -> Result<Course, CanvasError> {
         let course = self
             .get(&format!("courses/{course_id}"))
             .await?
@@ -21,12 +21,12 @@ impl Canvas {
         Ok(course)
     }
 
-    pub async fn course_list(&self) -> Result<Vec<Course>, CanvasError> {
+    pub async fn list_courses(&self) -> Result<Vec<Course>, CanvasError> {
         let courses = self.get("courses").await?.json::<Vec<Course>>().await?;
         Ok(courses)
     }
 
-    pub async fn course_list_for_user(&self, user_id: u32) -> Result<Vec<Course>, CanvasError> {
+    pub async fn list_courses_for_user(&self, user_id: u32) -> Result<Vec<Course>, CanvasError> {
         let courses = self
             .get(&format!("users/{user_id}/courses"))
             .await?
