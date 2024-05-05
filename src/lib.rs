@@ -9,3 +9,7 @@ pub mod grading_period;
 pub mod permission;
 pub mod timestamps;
 pub mod user;
+
+use futures::Stream;
+use std::pin::Pin;
+pub type PaginatedVec<'a, T> = Pin<Box<dyn Stream<Item = T> + 'a>>;

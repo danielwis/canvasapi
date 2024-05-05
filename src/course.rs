@@ -1,6 +1,7 @@
 use crate::canvas::Canvas;
 use crate::enrollment::Enrollment;
 use crate::timestamps::deserialize_optional_timestamp;
+use crate::PaginatedVec;
 use crate::{
     blueprint_course::BlueprintRestrictions, error::CanvasError, grading_period::GradingPeriod,
     permission::Permission,
@@ -14,21 +15,20 @@ use time::OffsetDateTime;
 impl Canvas {
     pub async fn get_course(&self, course_id: u32) -> Result<Course, CanvasError> {
         let course = self
-            .get(&format!("courses/{course_id}"))
+            .get_endpoint(&format!("courses/{course_id}"))
             .await?
             .json::<Course>()
             .await?;
         Ok(course)
     }
 
-    pub async fn list_courses(&self) -> Result<Vec<Course>, CanvasError> {
-        let courses = self.get("courses").await?.json::<Vec<Course>>().await?;
-        Ok(courses)
+    pub async fn list_courses(&self) -> PaginatedVec<Course> {
+        self.stream::<Course>("courses").await
     }
 
     pub async fn list_courses_for_user(&self, user_id: u32) -> Result<Vec<Course>, CanvasError> {
         let courses = self
-            .get(&format!("users/{user_id}/courses"))
+            .get_endpoint(&format!("users/{user_id}/courses"))
             .await?
             .json::<Vec<Course>>()
             .await?;

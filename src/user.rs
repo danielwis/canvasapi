@@ -10,7 +10,7 @@ use time::OffsetDateTime;
 impl Canvas {
     pub async fn get_user(&self, user_id: u32) -> Result<User, CanvasError> {
         let user = self
-            .get(&format!("users/{user_id}"))
+            .get_endpoint(&format!("users/{user_id}"))
             .await?
             .json::<User>()
             .await?;
@@ -19,7 +19,7 @@ impl Canvas {
 
     pub async fn list_users_in_account(&self, account_id: u32) -> Result<Vec<User>, CanvasError> {
         let users = self
-            .get(&format!("accounts/{account_id}/users"))
+            .get_endpoint(&format!("accounts/{account_id}/users"))
             .await?
             .json::<Vec<User>>()
             .await?;
