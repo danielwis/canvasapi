@@ -1,31 +1,9 @@
-use crate::canvas::Canvas;
-use crate::enrollment::Enrollment;
-use crate::error::CanvasError;
+use super::enrollments::Enrollment;
 use crate::timestamps::deserialize_optional_timestamp;
 
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 use time::OffsetDateTime;
-
-impl Canvas {
-    pub async fn get_user(&self, user_id: u32) -> Result<User, CanvasError> {
-        let user = self
-            .get_endpoint(&format!("users/{user_id}"))
-            .await?
-            .json::<User>()
-            .await?;
-        Ok(user)
-    }
-
-    pub async fn list_users_in_account(&self, account_id: u32) -> Result<Vec<User>, CanvasError> {
-        let users = self
-            .get_endpoint(&format!("accounts/{account_id}/users"))
-            .await?
-            .json::<Vec<User>>()
-            .await?;
-        Ok(users)
-    }
-}
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "snake_case")]

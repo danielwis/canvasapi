@@ -1,40 +1,13 @@
-use crate::canvas::Canvas;
-use crate::enrollment::Enrollment;
-use crate::timestamps::deserialize_optional_timestamp;
-use crate::PaginatedVec;
-use crate::{
-    blueprint_course::BlueprintRestrictions, error::CanvasError, grading_period::GradingPeriod,
-    permission::Permission,
+use super::{
+    blueprint_courses::BlueprintRestrictions, enrollments::Enrollment,
+    grading_periods::GradingPeriod, permissions::Permission,
 };
+use crate::timestamps::deserialize_optional_timestamp;
 
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fmt::Display;
 use time::OffsetDateTime;
-
-impl Canvas {
-    pub async fn get_course(&self, course_id: u32) -> Result<Course, CanvasError> {
-        let course = self
-            .get_endpoint(&format!("courses/{course_id}"))
-            .await?
-            .json::<Course>()
-            .await?;
-        Ok(course)
-    }
-
-    pub async fn list_courses(&self) -> PaginatedVec<Course> {
-        self.stream::<Course>("courses").await
-    }
-
-    pub async fn list_courses_for_user(&self, user_id: u32) -> Result<Vec<Course>, CanvasError> {
-        let courses = self
-            .get_endpoint(&format!("users/{user_id}/courses"))
-            .await?
-            .json::<Vec<Course>>()
-            .await?;
-        Ok(courses)
-    }
-}
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "snake_case")]
