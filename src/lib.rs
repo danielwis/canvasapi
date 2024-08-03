@@ -28,6 +28,10 @@ pub struct PaginationInfo {
     last_url: Option<String>,
 }
 
+async fn convert_response<R: DeserializeOwned>(resp: reqwest::Response) -> CanvasResult<R> {
+    resp.json::<R>().await.map_err(Into::into)
+}
+
 /* // Course
 impl Canvas {
     pub async fn get_course(&self, course_id: u32) -> Result<Course, CanvasError> {
@@ -103,12 +107,25 @@ impl Canvas {
         format!("{}/api/v1/{}", self.api_url, endpoint)
     }
 
-    pub(crate) async fn get(&self, url: &str) -> reqwest::Result<reqwest::Response> {
-        self.client.get(url).send().await
+    pub async fn get(
+        &self,
+        url: &str,
+        headers: Option<HeaderMap>,
+    ) -> CanvasResult<reqwest::Response> {
+        let mut req = self.client.get(url);
+        if let Some(headers) = headers {
+            req = req.headers(headers);
+        }
+        req.send().await.map_err(Into::into)
     }
 
-    pub(crate) async fn get_endpoint(&self, endpoint: &str) -> reqwest::Result<reqwest::Response> {
-        self.get(&self.api_url(endpoint)).await
+    pub async fn get_endpoint<R: DeserializeOwned>(
+        &self,
+        endpoint: &str,
+        headers: Option<HeaderMap>,
+    ) -> CanvasResult<R> {
+        let resp = self.get(&self.url_from_endpoint(endpoint), headers).await?;
+        convert_response(resp).await
     }
 
     fn parse_pagination_info(link_header: Option<&HeaderValue>) -> Result<PaginationInfo, ()> {
