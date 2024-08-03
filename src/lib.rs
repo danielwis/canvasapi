@@ -1,5 +1,10 @@
 // TODO: Look into Url type for url fields instead of Strings
 // TODO: Look into proper timezone/locale types
+// TODO: README
+// TODO: Remove `get_` prefix from functions
+// TODO: Documentation
+// TODO: Testing
+mod api;
 pub mod error;
 pub mod models;
 pub mod timestamps;
@@ -7,8 +12,10 @@ pub mod timestamps;
 use futures::Stream;
 use std::pin::Pin;
 pub type PaginatedVec<'a, T> = Pin<Box<dyn Stream<Item = T> + 'a>>;
+pub type CanvasResult<T> = Result<T, CanvasError>;
 
 use crate::error::CanvasError;
+use api::courses::CourseHandler;
 
 use futures::{stream, StreamExt};
 use reqwest::header::{HeaderMap, HeaderValue, AUTHORIZATION};
@@ -16,7 +23,7 @@ use serde::de::DeserializeOwned;
 
 pub struct Canvas {
     client: reqwest::Client,
-    api_url: String,
+    base_url: String,
 }
 
 #[derive(Debug, Default)]
@@ -80,7 +87,7 @@ impl Canvas {
 
 impl Canvas {
     // TODO: Include API version as an argument
-    pub fn init(api_url: &str, api_token: &str) -> Result<Self, CanvasError> {
+    pub fn init(base_url: &str, api_token: &str) -> CanvasResult<Self> {
         // TODO: Warn/error if URL...
         // - contains an API version
         // - contains "http://"
@@ -99,12 +106,12 @@ impl Canvas {
                     headers
                 })
                 .build()?,
-            api_url: api_url.to_string(),
+            base_url: base_url.to_string(),
         })
     }
 
-    fn api_url(&self, endpoint: &str) -> String {
-        format!("{}/api/v1/{}", self.api_url, endpoint)
+    fn url_from_endpoint(&self, endpoint: &str) -> String {
+        format!("{}/api/v1/{}", self.base_url, endpoint)
     }
 
     pub async fn get(
@@ -161,15 +168,15 @@ impl Canvas {
 
     // TODO: Error handling, return results? This means using futures::StreamTryExt instead of
     // StreamExt
-    pub(crate) async fn stream<T: DeserializeOwned>(&self, endpoint: &str) -> PaginatedVec<'_, T> {
-        let first_url = Some(self.api_url(endpoint));
+    pub async fn stream_endpoint<T: DeserializeOwned>(&self, endpoint: &str) -> PaginatedVec<'_, T> {
+        let first_url = Some(self.url_from_endpoint(endpoint));
 
         Box::pin(
             stream::unfold(first_url, move |state| async {
                 let Some(state) = state else {
                     return None;
                 };
-                let resp = self.get(&state).await.unwrap();
+                let resp = self.get(&state, None).await.unwrap();
                 let pag_info = Canvas::parse_pagination_info(resp.headers().get("link")).unwrap();
 
                 let items = resp.json::<Vec<T>>().await.unwrap();
@@ -178,5 +185,11 @@ impl Canvas {
             })
             .flatten(),
         )
+    }
+}
+
+impl Canvas {
+    pub fn courses(&self) -> CourseHandler {
+        CourseHandler::new(self)
     }
 }
