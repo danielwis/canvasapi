@@ -15,7 +15,7 @@ pub type PaginatedVec<'a, T> = Pin<Box<dyn Stream<Item = T> + 'a>>;
 pub type CanvasResult<T> = Result<T, CanvasError>;
 
 use crate::error::CanvasError;
-use api::courses::CourseHandler;
+use api::{courses::CourseHandler, users::UserHandler};
 
 use futures::{stream, StreamExt};
 use reqwest::header::{HeaderMap, HeaderValue, AUTHORIZATION};
@@ -38,52 +38,6 @@ pub struct PaginationInfo {
 async fn convert_response<R: DeserializeOwned>(resp: reqwest::Response) -> CanvasResult<R> {
     resp.json::<R>().await.map_err(Into::into)
 }
-
-/* // Course
-impl Canvas {
-    pub async fn get_course(&self, course_id: u32) -> Result<Course, CanvasError> {
-        let course = self
-            .get_endpoint(&format!("courses/{course_id}"))
-            .await?
-            .json::<Course>()
-            .await?;
-        Ok(course)
-    }
-
-    pub async fn list_courses(&self) -> PaginatedVec<Course> {
-        self.stream::<Course>("courses").await
-    }
-
-    pub async fn list_courses_for_user(&self, user_id: u32) -> Result<Vec<Course>, CanvasError> {
-        let courses = self
-            .get_endpoint(&format!("users/{user_id}/courses"))
-            .await?
-            .json::<Vec<Course>>()
-            .await?;
-        Ok(courses)
-    }
-}
-
-// User
-impl Canvas {
-    pub async fn get_user(&self, user_id: u32) -> Result<User, CanvasError> {
-        let user = self
-            .get_endpoint(&format!("users/{user_id}"))
-            .await?
-            .json::<User>()
-            .await?;
-        Ok(user)
-    }
-
-    pub async fn list_users_in_account(&self, account_id: u32) -> Result<Vec<User>, CanvasError> {
-        let users = self
-            .get_endpoint(&format!("accounts/{account_id}/users"))
-            .await?
-            .json::<Vec<User>>()
-            .await?;
-        Ok(users)
-    }
-} */
 
 impl Canvas {
     // TODO: Include API version as an argument
@@ -168,7 +122,10 @@ impl Canvas {
 
     // TODO: Error handling, return results? This means using futures::StreamTryExt instead of
     // StreamExt
-    pub async fn stream_endpoint<T: DeserializeOwned>(&self, endpoint: &str) -> PaginatedVec<'_, T> {
+    pub async fn stream_endpoint<T: DeserializeOwned>(
+        &self,
+        endpoint: &str,
+    ) -> PaginatedVec<'_, T> {
         let first_url = Some(self.url_from_endpoint(endpoint));
 
         Box::pin(
@@ -191,5 +148,9 @@ impl Canvas {
 impl Canvas {
     pub fn courses(&self) -> CourseHandler {
         CourseHandler::new(self)
+    }
+
+    pub fn users(&self) -> UserHandler {
+        UserHandler::new(self)
     }
 }
