@@ -17,7 +17,6 @@ pub type CanvasResult<T> = Result<T, CanvasError>;
 use crate::error::CanvasError;
 use api::{courses::CourseHandler, users::UserHandler};
 
-use futures::{stream, StreamExt};
 use reqwest::header::{HeaderMap, HeaderValue, AUTHORIZATION};
 use serde::de::DeserializeOwned;
 
@@ -89,20 +88,20 @@ impl Canvas {
         convert_response(resp).await
     }
 
-    fn parse_pagination_info(link_header: Option<&HeaderValue>) -> Result<PaginationInfo, ()> {
+    fn parse_pagination_info(link_header: Option<&HeaderValue>) -> CanvasResult<PaginationInfo> {
         let mut info: PaginationInfo = Default::default();
         let Some(links) = link_header else {
             return Ok(info);
         };
 
         let Ok(links) = links.to_str() else {
-            return Err(());
+            return Err(CanvasError::Pagination);
         };
 
         for link in links.split(',') {
-            let (link, mut rel) = link.split_once(';').ok_or(())?;
-            rel = rel.strip_prefix(" rel=\"").unwrap();
-            rel = rel.strip_suffix('\"').unwrap();
+            let (link, mut rel) = link.split_once(';').ok_or(CanvasError::Pagination)?;
+            rel = rel.strip_prefix(" rel=\"").ok_or(CanvasError::Pagination)?;
+            rel = rel.strip_suffix('\"').ok_or(CanvasError::Pagination)?;
             let mut link = link.chars();
             link.next();
             link.next_back();
@@ -120,28 +119,29 @@ impl Canvas {
         Ok(info)
     }
 
-    // TODO: Error handling, return results? This means using futures::StreamTryExt instead of
-    // StreamExt
-    pub async fn stream_endpoint<T: DeserializeOwned>(
-        &self,
+    pub async fn stream_endpoint<'a, T: DeserializeOwned + 'a>(
+        &'a self,
         endpoint: &str,
-    ) -> PaginatedVec<'_, T> {
-        let first_url = Some(self.url_from_endpoint(endpoint));
+    ) -> PaginatedVec<'_, CanvasResult<T>> {
+        use async_stream::stream;
+        let mut first_url = Some(self.url_from_endpoint(endpoint));
 
-        Box::pin(
-            stream::unfold(first_url, move |state| async {
-                let Some(state) = state else {
-                    return None;
+        Box::pin(stream! {
+            loop {
+                let Some(url) = first_url else {
+                    break;
                 };
-                let resp = self.get(&state, None).await.unwrap();
-                let pag_info = Canvas::parse_pagination_info(resp.headers().get("link")).unwrap();
+                let resp = self.get(&url, None).await?;
+                let pag_info = Canvas::parse_pagination_info(resp.headers().get("link"))?;
 
-                let items = resp.json::<Vec<T>>().await.unwrap();
+                let items = resp.json::<Vec<T>>().await?;
+                for item in items {
+                    yield Ok(item);
+                }
 
-                Some((stream::iter(items), pag_info.next_url))
-            })
-            .flatten(),
-        )
+                first_url = pag_info.next_url;
+            }
+        })
     }
 }
 

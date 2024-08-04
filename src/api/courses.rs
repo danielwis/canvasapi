@@ -19,12 +19,12 @@ impl<'canvas> CourseHandler<'canvas> {
     /// List the current user's active courses.
     ///
     /// The current user is the one to which the API token belongs.
-    pub async fn list(&self) -> PaginatedVec<Course> {
+    pub async fn list(&self) -> PaginatedVec<CanvasResult<Course>> {
         self.canvas.stream_endpoint("courses").await
     }
 
     /// List the active courses for a specific user.
-    pub async fn list_for_user(&self, user_id: u32) -> PaginatedVec<Course> {
+    pub async fn list_for_user(&self, user_id: u32) -> PaginatedVec<CanvasResult<Course>> {
         self.canvas
             .stream_endpoint(&format!("users/{user_id}/courses"))
             .await

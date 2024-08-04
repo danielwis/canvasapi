@@ -17,7 +17,7 @@ impl<'canvas> UserHandler<'canvas> {
     }
 
     /// List the active courses for a specific user.
-    pub async fn list_for_account(&self, account_id: u32) -> PaginatedVec<User> {
+    pub async fn list_for_account(&self, account_id: u32) -> PaginatedVec<CanvasResult<User>> {
         self.canvas
             .stream_endpoint(&format!("accounts/{account_id}/users"))
             .await
